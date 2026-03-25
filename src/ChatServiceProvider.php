@@ -53,6 +53,8 @@ class ChatServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'chat');
+        
         $this->registerPublishing();
         $this->registerMigrations();
         $this->registerMiddleware();
@@ -119,6 +121,10 @@ class ChatServiceProvider extends ServiceProvider
                     __DIR__ . '/../resources/views' => resource_path('views/vendor/chat'),
                 ], 'chat-views');
             }
+
+            $this->publishes([
+                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/chat'),
+            ], 'chat-translations');
         }
     }
 

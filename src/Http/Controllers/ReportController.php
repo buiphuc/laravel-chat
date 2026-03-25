@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use PhucBui\Chat\ChatManager;
 use PhucBui\Chat\Contracts\Repositories\ChatReportRepositoryInterface;
+use PhucBui\Chat\Http\Requests\ReviewReportRequest;
+use PhucBui\Chat\Http\Requests\StoreReportRequest;
 use PhucBui\Chat\Models\ChatMessage;
 
 class ReportController extends Controller
@@ -20,17 +22,13 @@ class ReportController extends Controller
     /**
      * Report a message.
      */
-    public function store(Request $request, int $messageId): JsonResponse
+    public function store(StoreReportRequest $request, int $messageId): JsonResponse
     {
         $actor = $request->input('chat_actor');
 
         if (!config('chat.block_report.report_enabled', true)) {
-            abort(403, 'Report feature is disabled.');
+            abort(403, trans('chat::messages.report_feature_disabled'));
         }
-
-        $request->validate([
-            'reason' => 'required|string|max:500',
-        ]);
 
         $message = ChatMessage::findOrFail($messageId);
 
@@ -53,7 +51,7 @@ class ReportController extends Controller
         $actorName = $request->input('chat_actor_name');
 
         if (!$this->chatManager->hasCapability($actorName, 'can_review_reports')) {
-            abort(403);
+            abort(403, trans('chat::messages.forbidden_review_reports'));
         }
 
         $status = $request->input('status', 'pending');
@@ -70,18 +68,14 @@ class ReportController extends Controller
     /**
      * Review a report (super_admin / reviewer only).
      */
-    public function update(Request $request, int $reportId): JsonResponse
+    public function update(ReviewReportRequest $request, int $reportId): JsonResponse
     {
         $actor = $request->input('chat_actor');
         $actorName = $request->input('chat_actor_name');
 
         if (!$this->chatManager->hasCapability($actorName, 'can_review_reports')) {
-            abort(403);
+            abort(403, trans('chat::messages.forbidden_review_reports'));
         }
-
-        $request->validate([
-            'status' => 'required|in:reviewed,dismissed',
-        ]);
 
         $report = $this->reportRepository->findOrFail($reportId);
 

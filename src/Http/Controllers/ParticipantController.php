@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use PhucBui\Chat\ChatManager;
 use PhucBui\Chat\Contracts\Repositories\ChatRoleRepositoryInterface;
+use PhucBui\Chat\Http\Requests\StoreParticipantRequest;
+use PhucBui\Chat\Http\Requests\UpdateParticipantRoleRequest;
 use PhucBui\Chat\Http\Resources\ParticipantResource;
 use PhucBui\Chat\Models\ChatRoom;
 use PhucBui\Chat\Services\RoomService;
@@ -33,19 +35,13 @@ class ParticipantController extends Controller
     /**
      * Add a participant to a room.
      */
-    public function store(Request $request, ChatRoom $room): JsonResponse
+    public function store(StoreParticipantRequest $request, ChatRoom $room): JsonResponse
     {
         $actorName = $request->input('chat_actor_name');
 
         if (!$this->chatManager->hasCapability($actorName, 'can_manage_participants')) {
-            abort(403);
+            abort(403, trans('chat::messages.forbidden_manage_participants'));
         }
-
-        $request->validate([
-            'actor_id' => 'required|integer',
-            'actor_type' => 'required|string',
-            'role_name' => 'sometimes|string',
-        ]);
 
         $modelClass = $request->input('actor_type');
         $actor = $modelClass::findOrFail($request->input('actor_id'));
@@ -64,24 +60,20 @@ class ParticipantController extends Controller
     /**
      * Update participant role (super_admin only).
      */
-    public function update(Request $request, ChatRoom $room, int $participantId): JsonResponse
+    public function update(UpdateParticipantRoleRequest $request, ChatRoom $room, int $participantId): JsonResponse
     {
         $actorName = $request->input('chat_actor_name');
 
         // Only super_admin can change roles
         if (!$this->chatManager->hasCapability($actorName, 'can_change_roles')) {
-            abort(403, 'Only super admin can change participant roles.');
+            abort(403, trans('chat::messages.forbidden_change_roles'));
         }
-
-        $request->validate([
-            'role_name' => 'required|string',
-        ]);
 
         $participant = $room->participants()->findOrFail($participantId);
         $role = $this->roleRepository->findByName($request->input('role_name'));
 
         if (!$role) {
-            abort(422, 'Role not found.');
+            abort(422, trans('chat::messages.role_not_found'));
         }
 
         $participant->update(['role_id' => $role->id]);
@@ -97,7 +89,7 @@ class ParticipantController extends Controller
         $actorName = $request->input('chat_actor_name');
 
         if (!$this->chatManager->hasCapability($actorName, 'can_manage_participants')) {
-            abort(403);
+            abort(403, trans('chat::messages.forbidden_manage_participants'));
         }
 
         $participant = $room->participants()->findOrFail($participantId);

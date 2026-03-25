@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use PhucBui\Chat\ChatManager;
 use PhucBui\Chat\DTOs\RoomData;
+use PhucBui\Chat\Http\Requests\StoreRoomRequest;
+use PhucBui\Chat\Http\Requests\UpdateRoomRequest;
 use PhucBui\Chat\Http\Resources\RoomResource;
 use PhucBui\Chat\Services\AdminRoutingService;
 use PhucBui\Chat\Services\RoomService;
@@ -41,20 +43,10 @@ class RoomController extends Controller
     /**
      * Create a new room.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreRoomRequest $request): JsonResponse
     {
         $actor = $request->input('chat_actor');
         $actorName = $request->input('chat_actor_name');
-
-        $request->validate([
-            'target_id' => 'required_without:name|integer',
-            'target_type' => 'required_with:target_id|string',
-            'name' => 'required_without:target_id|string|max:255',
-            'max_members' => 'nullable|integer|min:2',
-            'participant_ids' => 'nullable|array',
-            'participant_ids.*' => 'integer',
-            'participant_type' => 'required_with:participant_ids|string',
-        ]);
 
         // Direct room
         if ($request->has('target_id')) {
@@ -73,7 +65,7 @@ class RoomController extends Controller
         } else {
             // Group room
             if (!$this->chatManager->hasCapability($actorName, 'can_create_group')) {
-                abort(403, 'You cannot create group rooms.');
+                abort(403, trans('chat::messages.forbidden_create_group'));
             }
 
             $data = RoomData::fromArray($request->all());
@@ -88,18 +80,13 @@ class RoomController extends Controller
     /**
      * Update a room.
      */
-    public function update(Request $request, $room): JsonResponse
+    public function update(UpdateRoomRequest $request, $room): JsonResponse
     {
         $actorName = $request->input('chat_actor_name');
 
         if (!$this->chatManager->hasCapability($actorName, 'can_manage_participants')) {
-            abort(403);
+            abort(403, trans('chat::messages.forbidden_manage_participants'));
         }
-
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'metadata' => 'sometimes|array',
-        ]);
 
         $room = $this->roomService->updateRoom($room, $request->only(['name', 'metadata']));
 
@@ -114,7 +101,7 @@ class RoomController extends Controller
         $actorName = $request->input('chat_actor_name');
 
         if (!$this->chatManager->hasCapability($actorName, 'can_manage_participants')) {
-            abort(403);
+            abort(403, trans('chat::messages.forbidden_manage_participants'));
         }
 
         $this->roomService->deleteRoom($room);

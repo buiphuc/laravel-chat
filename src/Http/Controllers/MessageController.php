@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use PhucBui\Chat\DTOs\MessageData;
 use PhucBui\Chat\Events\UserTyping;
+use PhucBui\Chat\Http\Requests\SearchMessageRequest;
+use PhucBui\Chat\Http\Requests\StoreMessageRequest;
 use PhucBui\Chat\Http\Resources\MessageResource;
 use PhucBui\Chat\Models\ChatRoom;
 use PhucBui\Chat\Services\AttachmentService;
@@ -36,18 +38,9 @@ class MessageController extends Controller
     /**
      * Send a message to a room.
      */
-    public function store(Request $request, ChatRoom $room): JsonResponse
+    public function store(StoreMessageRequest $request, ChatRoom $room): JsonResponse
     {
         $actor = $request->input('chat_actor');
-
-        $request->validate([
-            'body' => 'required_without:attachments|string|max:' . config('chat.messages.max_length', 5000),
-            'type' => 'sometimes|string|in:text,image,file,system',
-            'parent_id' => 'sometimes|integer',
-            'metadata' => 'sometimes|array',
-            'attachments' => 'sometimes|array',
-            'attachments.*' => 'file',
-        ]);
 
         $data = MessageData::fromArray($request->all());
         $message = $this->messageService->send($room, $actor, $data);
@@ -96,14 +89,8 @@ class MessageController extends Controller
     /**
      * Search messages.
      */
-    public function search(Request $request): JsonResponse
+    public function search(SearchMessageRequest $request): JsonResponse
     {
-        $request->validate([
-            'keyword' => 'required|string|min:2',
-            'room_id' => 'sometimes|integer',
-            'from_date' => 'sometimes|date',
-            'to_date' => 'sometimes|date',
-        ]);
 
         $messages = $this->searchService->search(
             $request->input('keyword'),

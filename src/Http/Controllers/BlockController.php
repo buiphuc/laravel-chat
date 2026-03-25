@@ -6,6 +6,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use PhucBui\Chat\ChatManager;
+use PhucBui\Chat\Http\Requests\BlockUserRequest;
+use PhucBui\Chat\Http\Requests\UnblockUserRequest;
 use PhucBui\Chat\Services\BlockService;
 
 class BlockController extends Controller
@@ -19,19 +21,14 @@ class BlockController extends Controller
     /**
      * Block a user.
      */
-    public function store(Request $request, int $userId): JsonResponse
+    public function store(BlockUserRequest $request, int $userId): JsonResponse
     {
         $actor = $request->input('chat_actor');
         $actorName = $request->input('chat_actor_name');
 
         if (!$this->chatManager->hasCapability($actorName, 'can_block_users') || !config('chat.block_report.block_enabled', true)) {
-            abort(403);
+            abort(403, trans('chat::messages.forbidden_block_users'));
         }
-
-        $request->validate([
-            'target_type' => 'required|string',
-            'reason' => 'sometimes|string|max:500',
-        ]);
 
         $targetModel = $request->input('target_type');
         $target = $targetModel::findOrFail($userId);
@@ -44,13 +41,9 @@ class BlockController extends Controller
     /**
      * Unblock a user.
      */
-    public function destroy(Request $request, int $userId): JsonResponse
+    public function destroy(UnblockUserRequest $request, int $userId): JsonResponse
     {
         $actor = $request->input('chat_actor');
-
-        $request->validate([
-            'target_type' => 'required|string',
-        ]);
 
         $targetModel = $request->input('target_type');
         $target = $targetModel::findOrFail($userId);
