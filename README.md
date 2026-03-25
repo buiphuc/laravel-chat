@@ -91,6 +91,16 @@ Since `laravel-chat` is a highly customizable package with multi-actor routing, 
 
 ---
 
+## Credits & Contact
+
+Developed and maintained by **Bui Phuc**.
+- **Email**: bui.phuc.vt@gmail.com
+- **LinkedIn**: [https://www.linkedin.com/in/bmphuc/](https://www.linkedin.com/in/bmphuc/)
+
+Feel free to reach out if you have any questions, feature requests, or collaboration proposals!
+
+---
+
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
