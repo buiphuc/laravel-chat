@@ -1,0 +1,48 @@
+{
+    "block_user": {
+        "description": "Block user",
+        "method": "POST",
+        "url": "/api/chat/users/{user}/block",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "success",
+                "data": {"target_type": "PhucBui\\Chat\\Tests\\TestUser", "reason": "Spam"},
+                "expected_status": 201
+            }
+        ]
+    },
+    "block_user_unauthorized": {
+        "description": "Block user unauthorized",
+        "method": "POST",
+        "url": "/api/chat/users/{user}/block",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "forbidden",
+                "data": {"target_type": "PhucBui\\Chat\\Tests\\TestUser"},
+                "expected_status": 403
+            }
+        ]
+    },
+    "unblock_user": {
+        "description": "Unblock user",
+        "method": "DELETE",
+        "url": "/api/chat/users/{user}/block",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "success",
+                "data": {"target_type": "PhucBui\\Chat\\Tests\\TestUser"},
+                "expected_status": 200
+            }
+        ]
+    },
+    "list_blocked_users": {
+        "description": "List blocked users",
+        "method": "GET",
+        "url": "/api/chat/blocked-users",
+        "auth": "client",
+        "expected_status": 200
+    }
+}

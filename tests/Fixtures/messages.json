@@ -1,0 +1,61 @@
+{
+    "list_messages": {
+        "description": "List messages for a room",
+        "method": "GET",
+        "url": "/api/chat/rooms/{room}/messages",
+        "auth": "client",
+        "expected_status": 200
+    },
+    "list_messages_unauthorized": {
+        "description": "List messages unauthorized (user not in room, no global capability)",
+        "method": "GET",
+        "url": "/api/chat/rooms/{room}/messages",
+        "auth": "client",
+        "expected_status": 403
+    },
+    "send_message": {
+        "description": "Send a message",
+        "method": "POST",
+        "url": "/api/chat/rooms/{room}/messages",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "send_success",
+                "data": {"body": "Hello World", "type": "text"},
+                "expected_status": 201
+            },
+            {
+                "case": "missing_body",
+                "data": {"type": "text"},
+                "expected_status": 422
+            }
+        ]
+    },
+    "mark_as_read": {
+        "description": "Mark messages as read",
+        "method": "POST",
+        "url": "/api/chat/rooms/{room}/read",
+        "auth": "client",
+        "expected_status": 200
+    },
+    "typing": {
+        "description": "Send typing indicator",
+        "method": "POST",
+        "url": "/api/chat/rooms/{room}/typing",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "is_typing",
+                "data": {"is_typing": true},
+                "expected_status": 200
+            }
+        ]
+    },
+    "search_messages": {
+        "description": "Search messages",
+        "method": "GET",
+        "url": "/api/chat/messages/search",
+        "auth": "client",
+        "expected_status": 200
+    }
+}

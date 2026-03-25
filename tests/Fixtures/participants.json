@@ -1,0 +1,55 @@
+{
+    "list_participants": {
+        "description": "List participants in a room",
+        "method": "GET",
+        "url": "/api/chat/rooms/{room}/participants",
+        "auth": "client",
+        "expected_status": 200
+    },
+    "add_participant": {
+        "description": "Add participant",
+        "method": "POST",
+        "url": "/api/admin/chat/rooms/{room}/participants",
+        "auth": "admin",
+        "payloads": [
+            {
+                "case": "add_success",
+                "data": {"actor_id": "{actor_id}", "actor_type": "PhucBui\\Chat\\Tests\\TestUser", "role_name": "member"},
+                "expected_status": 201
+            }
+        ]
+    },
+    "add_participant_unauthorized": {
+        "description": "Add participant unauthorized",
+        "method": "POST",
+        "url": "/api/chat/rooms/{room}/participants",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "add_forbidden",
+                "data": {"actor_id": 999, "actor_type": "PhucBui\\Chat\\Tests\\TestUser"},
+                "expected_status": 403
+            }
+        ]
+    },
+    "update_participant_role": {
+        "description": "Update participant role",
+        "method": "PUT",
+        "url": "/api/super_admin/chat/rooms/{room}/participants/{participant}",
+        "auth": "super_admin",
+        "payloads": [
+            {
+                "case": "update_success",
+                "data": {"role_name": "admin"},
+                "expected_status": 200
+            }
+        ]
+    },
+    "remove_participant": {
+        "description": "Remove participant",
+        "method": "DELETE",
+        "url": "/api/admin/chat/rooms/{room}/participants/{participant}",
+        "auth": "admin",
+        "expected_status": 200
+    }
+}

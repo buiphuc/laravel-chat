@@ -1,0 +1,92 @@
+{
+    "list_rooms_admin": {
+        "description": "Admin lists all rooms",
+        "method": "GET",
+        "url": "/api/admin/chat/rooms",
+        "auth": "admin",
+        "expected_status": 200
+    },
+    "list_rooms_client": {
+        "description": "Client lists their rooms",
+        "method": "GET",
+        "url": "/api/chat/rooms",
+        "auth": "client",
+        "expected_status": 200
+    },
+    "create_direct_room": {
+        "description": "Create direct room",
+        "method": "POST",
+        "url": "/api/chat/rooms",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "direct_room_success",
+                "data": {"target_id": "{target_id}", "target_type": "PhucBui\\Chat\\Tests\\TestUser"},
+                "expected_status": 201
+            },
+            {
+                "case": "missing_target_returns_422",
+                "data": {},
+                "expected_status": 422
+            },
+            {
+                "case": "group_room_unauthorized_for_client",
+                "data": {"name": "Test Group", "max_members": 5, "participant_type": "PhucBui\\Chat\\Tests\\TestUser", "participant_ids": [2, 3]},
+                "expected_status": 403
+            }
+        ]
+    },
+    "create_group_room_admin": {
+        "description": "Admin creates group room",
+        "method": "POST",
+        "url": "/api/admin/chat/rooms",
+        "auth": "admin",
+        "payloads": [
+            {
+                "case": "group_room_success",
+                "data": {"name": "Test Group", "max_members": 5, "participant_type": "PhucBui\\Chat\\Tests\\TestUser", "participant_ids": [2, 3]},
+                "expected_status": 201
+            }
+        ]
+    },
+    "update_room": {
+        "description": "Update room details",
+        "method": "PUT",
+        "url": "/api/admin/chat/rooms/{room}",
+        "auth": "admin",
+        "payloads": [
+            {
+                "case": "update_success",
+                "data": {"name": "New Name"},
+                "expected_status": 200
+            }
+        ]
+    },
+    "update_room_unauthorized": {
+        "description": "Attempt to update room without capability",
+        "method": "PUT",
+        "url": "/api/chat/rooms/{room}",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "update_forbidden",
+                "data": {"name": "New Name"},
+                "expected_status": 403
+            }
+        ]
+    },
+    "delete_room": {
+        "description": "Delete room",
+        "method": "DELETE",
+        "url": "/api/admin/chat/rooms/{room}",
+        "auth": "admin",
+        "expected_status": 200
+    },
+    "delete_room_unauthorized": {
+        "description": "Delete room unauthorized",
+        "method": "DELETE",
+        "url": "/api/chat/rooms/{room}",
+        "auth": "client",
+        "expected_status": 403
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "report_message": {
+        "description": "Report a message",
+        "method": "POST",
+        "url": "/api/chat/messages/{message}/report",
+        "auth": "client",
+        "payloads": [
+            {
+                "case": "success",
+                "data": {"reason": "Abusive content"},
+                "expected_status": 201
+            }
+        ]
+    },
+    "list_reports": {
+        "description": "List reports",
+        "method": "GET",
+        "url": "/api/super_admin/chat/reports",
+        "auth": "super_admin",
+        "expected_status": 200
+    },
+    "list_reports_unauthorized": {
+        "description": "List reports unauthorized",
+        "method": "GET",
+        "url": "/api/chat/reports",
+        "auth": "client",
+        "expected_status": 403
+    },
+    "review_report": {
+        "description": "Review a report",
+        "method": "PUT",
+        "url": "/api/super_admin/chat/reports/{report}",
+        "auth": "super_admin",
+        "payloads": [
+            {
+                "case": "success",
+                "data": {"status": "reviewed"},
+                "expected_status": 200
+            }
+        ]
+    }
+}
