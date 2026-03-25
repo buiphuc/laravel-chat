@@ -96,6 +96,7 @@ Since `laravel-chat` is a highly customizable package with multi-actor routing, 
 Developed and maintained by **Bui Phuc**.
 - **Email**: bui.phuc.vt@gmail.com
 - **LinkedIn**: [https://www.linkedin.com/in/bmphuc/](https://www.linkedin.com/in/bmphuc/)
+- **Facebook**: [https://www.facebook.com/buiminhphuc.vt](https://www.facebook.com/buiminhphuc.vt)
 
 Feel free to reach out if you have any questions, feature requests, or collaboration proposals!
 
